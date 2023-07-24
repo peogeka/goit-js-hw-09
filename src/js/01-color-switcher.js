@@ -2,6 +2,11 @@ function getRandomHexColor() {
   return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
 }
 
+function toggleButtons(disabledBtn, enabledBtn) {
+  disabledBtn.disabled = true;
+  enabledBtn.disabled = false;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const startBtn = document.querySelector('[data-start]');
   const stopBtn = document.querySelector('[data-stop]');
@@ -9,9 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let intervalId = null;
 
   startBtn.addEventListener('click', function() {
-    
-    this.disabled = true;
-    stopBtn.disabled = false;
+    toggleButtons(this, stopBtn);
 
     intervalId = setInterval(function() {
       const randomColor = getRandomHexColor();
@@ -20,9 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   stopBtn.addEventListener('click', function() {
-   
-    this.disabled = true;
-    startBtn.disabled = false;
+    toggleButtons(this, startBtn);
 
     clearInterval(intervalId);
   });

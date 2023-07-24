@@ -16,38 +16,46 @@ function convertMs(ms) {
   return { days, hours, minutes, seconds };
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const startBtn = document.querySelector('[data-start]');
-  const dateTimePicker = document.getElementById('datetime-picker');
+function updateCountdownUI(days, hours, minutes, seconds) {
   const daysValue = document.querySelector('[data-days]');
   const hoursValue = document.querySelector('[data-hours]');
   const minutesValue = document.querySelector('[data-minutes]');
   const secondsValue = document.querySelector('[data-seconds]');
 
-  let countdownInterval = null;
+  daysValue.textContent = addLeadingZero(days);
+  hoursValue.textContent = addLeadingZero(hours);
+  minutesValue.textContent = addLeadingZero(minutes);
+  secondsValue.textContent = addLeadingZero(seconds);
+}
+
+function initCountdown() {
+  const startBtn = document.querySelector('[data-start]');
+  const dateTimePicker = document.getElementById('datetime-picker');
+
+ let countdownInterval = null;
 
   const options = {
     enableTime: true,
     time_24hr: true,
     defaultDate: new Date(),
     minuteIncrement: 1,
-    onClose(selectedDates) {
+    onClose: function([selectedDates]) { 
       const selectedDate = selectedDates[0];
 
-      if (selectedDate <= new Date()) {
+      if (selectedDate <= Date.now()) {
         window.alert("Please choose a date in the future");
         startBtn.disabled = true;
       } else {
         startBtn.disabled = false;
       }
     },
-  };
+    };
 
   flatpickr('#datetime-picker', options);
 
   startBtn.addEventListener('click', function() {
     const selectedDate = new Date(dateTimePicker.value);
-    const currentDate = new Date();
+    const currentDate = Date.now();
 
     if (selectedDate <= currentDate) {
       return;
@@ -57,18 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
       const remainingTime = selectedDate - new Date();
       if (remainingTime <= 0) {
         clearInterval(countdownInterval);
-        daysValue.textContent = '00';
-        hoursValue.textContent = '00';
-        minutesValue.textContent = '00';
-        secondsValue.textContent = '00';
+        updateCountdownUI(0, 0, 0, 0);
         startBtn.disabled = true;
       } else {
         const { days, hours, minutes, seconds } = convertMs(remainingTime);
-        daysValue.textContent = addLeadingZero(days);
-        hoursValue.textContent = addLeadingZero(hours);
-        minutesValue.textContent = addLeadingZero(minutes);
-        secondsValue.textContent = addLeadingZero(seconds);
+        updateCountdownUI(days, hours, minutes, seconds);
       }
     }, 1000);
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', initCountdown);
